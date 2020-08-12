@@ -8,7 +8,7 @@ arcpy.env.workspace = 'F:\MWARREN\_scratch\_scratch.gdb'
 arcpy.MakeFeatureLayer_management("parcels", "lyr") 
 
 # Select all cities which overlap the chihuahua polygon
-where_clause = arcpy.SelectLayerByLocation_management('lyr', 'NEW_SELECTION', " [PROP_ID] = '18277' ")
+arcpy.SelectLayerByAttribute_management ("lyr", "NEW_SELECTION", " [PROP_ID] = '18277' ")
 
 # Write the selected features to a new featureclass
 arcpy.CopyFeatures_management("lyr", "18277protest_test")
