@@ -1,14 +1,27 @@
 # Import system modules
-import arcpy
+import arcpy, os, sys
+
+# Import Environment
+from arcpy import env
 
 # Set the workspace
-arcpy.env.workspace = 'F:\MWARREN\_scratch\_scratch.gdb'
+arcpy.env.workspace = r'F:\MWARREN\_scratch\_scratch.gdb'
 
-#make layer from feature class
-arcpy.MakeFeatureLayer_management("parcels", "lyr") 
+#Make sure "ownership" layer is inside GDB
 
-# Select all cities which overlap the chihuahua polygon
-arcpy.SelectLayerByAttribute_management ("lyr", "NEW_SELECTION", " [PROP_ID] = '18277' ")
+PROP_ID = input("Enter PROP_ID: ")
+where_clause ='"PROP_ID" = ' + '{}'.format(PROP_ID)
+
+# Create selection of parcel with indicated input
+parcel = arcpy.SelectLayerByAttribute_management("ownership", "NEW_SELECTION", where_clause)
 
 # Write the selected features to a new featureclass
-arcpy.CopyFeatures_management("lyr", "18277protest_test")
+arcpy.CopyFeatures_management(parcel, "parcel{}".format(PROP_ID))
+
+# Create selection of 200ft buffer around indicated parcel
+buffer200 = arcpy.SelectLayerByLocation_management("ownership", 'INTERSECT', 'parcel{}'.format(PROP_ID), "200 Feet", 'NEW_SELECTION')
+
+# Write the selected features to a new featureclass
+arcpy.CopyFeatures_management(buffer200, "parcel{}_200ftbuffer".format(PROP_ID))
+
+
